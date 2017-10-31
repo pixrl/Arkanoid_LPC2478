@@ -1,0 +1,7 @@
+lcd_grph.o: lcd_grph.c ../startup/printf_P.h ../startup/config.h \
+ ../startup/consol.h ../startup/lpc24xx.h ../inc/general.h lcd_hw.h \
+ lcd_grph.h font5x7.h
+lcd_hw.o: lcd_hw.c ../inc/general.h ../startup/lpc24xx.h lcd_hw.h \
+ ../inc/delay.h ../startup/config.h ../startup/printf_P.h \
+ ../startup/config.h ../startup/consol.h
+font5x7.o: font5x7.c ../startup/lpc24xx.h font_macro.h
