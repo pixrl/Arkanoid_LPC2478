@@ -94,7 +94,17 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
  *
  ****************************************************************************/
 
+/*****************************************************************************
+ *
+ * Description:
+ *    Sound arrays declaration
+ *
+ ****************************************************************************/
 
+
+extern char wavSound[];
+
+tU32 wavSoundSize();
 
 /*****************************************************************************
  *
@@ -135,7 +145,8 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
  *    Always 0, since return value is not used.
  *
  ****************************************************************************/
-
+                                          
+                                          /* TIMERS */
  static void
 delayMs(tU16 delayInMs)
 {
@@ -153,6 +164,28 @@ delayMs(tU16 delayInMs)
   while (T1TCR & 0x01)
     ;
 }
+
+static void udelay( unsigned int delayInUs )
+{
+  /*
+   * setup timer #1 for delay
+   */
+  T1TCR = 0x02;          //stop and reset timer
+  T1PR  = 0x00;          //set prescaler to zero
+  T1MR0 = (((long)delayInUs-1) * (long)Fpclk/1000) / 1000;
+  T1IR  = 0xff;          //reset all interrrupt flags
+  T1MCR = 0x04;          //stop timer on match
+  T1TCR = 0x01;          //start timer
+  
+  //wait until delay time has elapsed
+  while (T1TCR & 0x01)
+    ;
+}
+
+
+
+
+
 void setLed(int led, int on)
 {
   tU8 commandString[] = {0x08, 0x00};
@@ -199,6 +232,45 @@ void setLed(int led, int on)
   commandString[1] = reg;
   pca9532(commandString, sizeof(commandString), NULL, 0);
 }
+
+
+short* pData = NULL;
+  tU32 size = 0;
+  tU32 cnt = 0;
+  tU32 samples = 0;
+  tU32 numSamples;
+  tU32 sampleRate;
+  tU16 usDelay;
+  tU16 audioFlag = 1;
+  short soundCounter = 0;
+
+void audioPoint(){
+
+
+        DACR = 0x7fc0;
+        numSamples = 1200;
+      
+        cnt++;
+        samples = 0;
+        usDelay = 1000000/ 24000 + 1;
+
+
+  
+        samples = 0;
+        cnt = 11 + pData[8]/2;
+  
+        while(samples++ < numSamples)
+        {
+          tS32 val;
+      
+          val = pData[cnt++];
+          DACR = ((val + 0x7fff) & 0xffc0); // |  //actual value to output
+  
+          udelay(usDelay);
+        }
+         
+    
+}
  
 int main(void)
 {
@@ -214,7 +286,16 @@ int main(void)
   //IODIR1  |= 0xFFF00000;
   //FIO2DIR |= 0x0000FFFF;
 
+  //Sound
 
+  
+  
+
+  PINSEL1 &= ~0x00300000;
+  PINSEL1 |=  0x00200000;
+
+  pData = (short*)&wavSound[0];
+  size = wavSoundSize();
 
 
   eaInit();
@@ -357,48 +438,99 @@ static tLcdParams ea_QVGA_v2 =
 				lcd_fillRect(320, newGame.racket.points[UPPERRIGHT].y, newGame.racket.points[UPPERRIGHT].x, newGame.racket.points[LOWERLEFT].y, BLACK);		
 			}
 		}
+
 		switch(newGame.player.score)
 		{
 			case 1:
 				setLed(1, 1);
+        if(soundCounter==0){
+        audioPoint();
+        soundCounter++;
+        }
 				break;
 			case 2:
 				setLed(2, 1);
+        if(soundCounter==1){
+        audioPoint();
+        soundCounter++;
+        }
 				break;
 			case 3:
 				setLed(3, 1);
-				break;
+        if(soundCounter==2){
+        audioPoint();
+        soundCounter++;
+        }
+        break;
 			case 4:
 				setLed(4, 1);
+        if(soundCounter==3){
+        audioPoint();
+        soundCounter++;
+        }
 				break;
 			case 5:
 				setLed(5, 1);
-				break;
+        if(soundCounter==4){
+        audioPoint(&audioFlag);
+        soundCounter++;
+        }
+        break;
 			case 6:
 				setLed(6, 1);
-				break;
+        if(soundCounter==5){
+        audioPoint(&audioFlag);
+        soundCounter++;
+        }
+        break;
 			case 7:
 				setLed(7, 1);
+        if(soundCounter==6){
+        audioPoint(&audioFlag);
+        soundCounter++;
+        }
 				break;
 			case 8:
 				setLed(8, 1);
+        if(soundCounter==7){
+        audioPoint(&audioFlag);
+        soundCounter++;
+        }
 				break;
 			case 9:
 				setLed(1, 0);
+        if(soundCounter==8){
+        audioPoint(&audioFlag);
+        }
+        delayMs(100);
 				setLed(2, 0);
+        delayMs(100);
 				setLed(3, 0);
+        delayMs(100);
 				setLed(4, 0);
+        delayMs(100);
 				setLed(5, 0);
+        delayMs(100);
 				setLed(6, 0);
+        delayMs(100);
 				setLed(7, 0);
+        delayMs(100);
 				setLed(8, 0);
+        delayMs(100);
 				setLed(1, 1);
+        delayMs(100);
 				setLed(2, 1);
+        delayMs(100);
 				setLed(3, 1);
+        delayMs(100);
 				setLed(4, 1);
+        delayMs(100);
 				setLed(5, 1);
+        delayMs(100);
 				setLed(6, 1);
+        delayMs(100);
 				setLed(7, 1);
+        delayMs(100);
 				setLed(8, 1);
 				delayMs(100);
 				flag = 1;
