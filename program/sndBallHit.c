@@ -463,7 +463,7 @@ const unsigned char wavSound[] __attribute__ ((aligned (4))) =
 0040, 0124, 0141, 0151, 0164, 0157, 0000
 };
 
-tU32 sndSize()
+tU32 wavSoundSize()
 {
   return sizeof(wavSound);
 }
