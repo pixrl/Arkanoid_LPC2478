@@ -271,7 +271,16 @@ void audioPoint(){
          
     
 }
- 
+
+
+void playAudioPoint(Game *inputGame){
+  if(soundCounter==(inputGame->player.score)-1){
+        audioPoint();
+        soundCounter++;
+          }
+}
+
+
 int main(void)
 {
   int test = 0;
@@ -443,65 +452,39 @@ static tLcdParams ea_QVGA_v2 =
 		{
 			case 1:
 				setLed(1, 1);
-        if(soundCounter==0){
-        audioPoint();
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
 				break;
 			case 2:
 				setLed(2, 1);
-        if(soundCounter==1){
-        audioPoint();
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
 				break;
 			case 3:
 				setLed(3, 1);
-        if(soundCounter==2){
-        audioPoint();
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
         break;
 			case 4:
 				setLed(4, 1);
-        if(soundCounter==3){
-        audioPoint();
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
 				break;
 			case 5:
 				setLed(5, 1);
-        if(soundCounter==4){
-        audioPoint(&audioFlag);
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
         break;
 			case 6:
 				setLed(6, 1);
-        if(soundCounter==5){
-        audioPoint(&audioFlag);
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
         break;
 			case 7:
 				setLed(7, 1);
-        if(soundCounter==6){
-        audioPoint(&audioFlag);
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
 				break;
 			case 8:
 				setLed(8, 1);
-        if(soundCounter==7){
-        audioPoint(&audioFlag);
-        soundCounter++;
-        }
+        playAudioPoint(&newGame);
 				break;
 			case 9:
 				setLed(1, 0);
-        if(soundCounter==8){
-        audioPoint(&audioFlag);
-        }
+        playAudioPoint(&newGame);
         delayMs(100);
 				setLed(2, 0);
         delayMs(100);
