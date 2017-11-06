@@ -47,10 +47,10 @@ EFLAGS  = -mthumb-interwork
 
 # Program code run in ARM or THUMB mode
 # Can be [ARM | THUMB]
-CODE    = THUMB
+CODE    = ARM
 
 # List C source files here.
-CSRCS   = main.c delay.c sdram.c arkanoid.c i2c.c pca9532.c
+CSRCS   = main.c delay.c sdram.c arkanoid.c i2c.c pca9532.c sndBallHit.c
 
 # List assembler source files here
 ASRCS   = 
