@@ -10,6 +10,8 @@ Implementacja Arkanoida w mikrokontrolerze NXP LPC2478
 
 * ### Dodać touch screen
 
+* ### Dodać dźwięki do innych akcji
+
 # Wykonane funkcjonalności:
 
 * ### LCD Screen
