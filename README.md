@@ -12,11 +12,11 @@ Implementacja Arkanoida w mikrokontrolerze NXP LPC2478
 
 # Wykonane funkcjonalności:
 
-### * LCD Screen
-### * I2C - Dimmer
-### * Joystick
-### * Sound
-### * Timer
-### * Sdram
-### * ????
-### * ????
+* ### LCD Screen
+* ### I2C - Dimmer
+* ### Joystick
+* ### Sound
+* ### Timer
+* ### Sdram
+* ### ????
+* ### ????
