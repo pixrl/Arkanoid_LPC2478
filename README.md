@@ -2,21 +2,21 @@
 Implementacja Arkanoida w mikrokontrolerze NXP LPC2478
 # TODO:
 
-## Dodać zmienną isGameUp, która zarządza stanem gry
+### * Dodać zmienną isGameUp, która zarządza stanem gry
 
-## Poprawić piłkę
+### * Poprawić piłkę
 
-## Odwrócić pole gry
+### * Odwrócić pole gry
 
-## Dodać touch screen
+### * Dodać touch screen
 
 # Wykonane funkcjonalności:
 
-## LCD Screen
-## I2C - Dimmer
-## Joystick
-## Sound
-## Timer
-## Sdram
-## ????
-## ????
+### * LCD Screen
+### * I2C - Dimmer
+### * Joystick
+### * Sound
+### * Timer
+### * Sdram
+### * ????
+### * ????
