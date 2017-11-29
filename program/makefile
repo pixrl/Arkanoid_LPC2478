@@ -50,8 +50,7 @@ EFLAGS  = -mthumb-interwork
 CODE    = ARM
 
 # List C source files here.
-CSRCS   = main.c delay.c sdram.c arkanoid.c i2c.c pca9532.c sndBallHit.c
-
+CSRCS   = main.c delay.c sdram.c arkanoid.c i2c.c pca9532.c sndBallHit.c ./game/src/*
 # List assembler source files here
 ASRCS   = 
 
@@ -62,7 +61,7 @@ SUBDIRS = startup ea_lcd
 LIBS    = startup/libea_startup_thumb.a ea_lcd/ea_lcd.a
 
 # Add include search path for startup files, and other include directories
-INC     = -I ./startup -I ./inc
+INC     = -I ./startup -I ./inc -I ./game/include
 
 # Select if an executable program or a library shall be created
 PROGRAM_MK  = true

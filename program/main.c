@@ -29,6 +29,21 @@
 #include "i2c.h"
 #include "pca9532.h"
 
+static void callConstructors()
+{
+    // Start and end points of the constructor list,
+    // defined by the linker script.
+    extern void (*__init_array_start)();
+    extern void (*__init_array_end)();
+
+    // Call each function in the list.
+    // We have to take the address of the symbols, as __init_array_start *is*
+    // the first function pointer, not the address of it.
+    for (void (**p)() = &__init_array_start; p < &__init_array_end; ++p) {
+        (*p)();
+    }
+}
+
 /******************************************************************************
  * Defines and typedefs
  *****************************************************************************/
@@ -283,6 +298,7 @@ void playAudioPoint(Game *inputGame){
 
 int main(void)
 {
+callConstructors();
   int test = 0;
   //joystick
   IODIR1 |= 0x38000000;
