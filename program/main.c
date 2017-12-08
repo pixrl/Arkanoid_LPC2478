@@ -101,40 +101,9 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
  *
  ****************************************************************************/
 
-
 extern char wavSound[];
 
 tU32 wavSoundSize();
-
-/*****************************************************************************
- *
- * Description:
- *    Demonstrates the use of simple line function.
- *
- ****************************************************************************/
-
-
-
-/*****************************************************************************
- *
- * Description:
- *    Demonstrates the use of the draw rectangle function
- *
- ****************************************************************************/
-
-
-
-/*****************************************************************************
- *
- * Description:
- *    Demonstrates the use of draw circle function
- *
- ****************************************************************************/
-
-
-/*****************************************************************************
- * Implementation of public functions
- ****************************************************************************/
 
 /*****************************************************************************
  *
@@ -146,9 +115,8 @@ tU32 wavSoundSize();
  *
  ****************************************************************************/
                                           
-                                          /* TIMERS */
- static void
-delayMs(tU16 delayInMs)
+                                         /* TIMERS */
+static void delayMs(tU16 delayInMs)
 {
   /*
    * setup timer #1 for delay
@@ -164,7 +132,6 @@ delayMs(tU16 delayInMs)
   while (T1TCR & 0x01)
     ;
 }
-
 static void udelay( unsigned int delayInUs )
 {
   /*
@@ -181,11 +148,6 @@ static void udelay( unsigned int delayInUs )
   while (T1TCR & 0x01)
     ;
 }
-
-
-
-
-
 void setLed(int led, int on)
 {
   tU8 commandString[] = {0x08, 0x00};
@@ -232,8 +194,6 @@ void setLed(int led, int on)
   commandString[1] = reg;
   pca9532(commandString, sizeof(commandString), NULL, 0);
 }
-
-
 short* pData = NULL;
   tU32 size = 0;
   tU32 cnt = 0;
@@ -243,19 +203,12 @@ short* pData = NULL;
   tU16 usDelay;
   tU16 audioFlag = 1;
   short soundCounter = 0;
-
 void audioPoint(){
-
-
         DACR = 0x7fc0;
         numSamples = 1200;
-      
         cnt++;
         samples = 0;
         usDelay = 1000000/ 24000 + 1;
-
-
-  
         samples = 0;
         cnt = 11 + pData[8]/2;
   
@@ -268,8 +221,6 @@ void audioPoint(){
   
           udelay(usDelay);
         }
-         
-    
 }
 
 
@@ -300,7 +251,6 @@ void refreshScreen(Game* game){
     				 game->blockPtr[i]->getColor(game->blockPtr[i]));
 }
 void playGame(Game* game){
-	int i = 0;
 	tU16 flag = 0;
 	refreshScreen(game);
     //printf("Wszystko init");
@@ -412,7 +362,6 @@ void playGame(Game* game){
 }
 int main(void)
 {
-  int test = 0;
   //joystick
   IODIR1 |= 0x38000000;
   IOCLR1 |= 0x38000000;
