@@ -244,11 +244,22 @@ void refreshScreen(Game* game){
   	lcd_fillcircle(game->ballPtr->getCenter(game->ballPtr).x, game->ballPtr->getCenter(game->ballPtr).y, 
   				   game->ballPtr->getRadius(game->ballPtr), game->ballPtr->getColor(game->ballPtr));
   	for(i = 0; i < game->getNumOfBlocks(game); ++i)
-  		lcd_fillRect(game->blockPtr[i]->getUpperRight(game->blockPtr[i]).x,
-   					 game->blockPtr[i]->getUpperRight(game->blockPtr[i]).y,
-    				 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).x,
-    				 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).y,
-    				 game->blockPtr[i]->getColor(game->blockPtr[i]));
+  	{
+  		if(game->blockPtr[i]->getIsDestroyed(game->blockPtr[i])){
+  			lcd_fillRect(game->blockPtr[i]->getUpperRight(game->blockPtr[i]).x,
+   						 game->blockPtr[i]->getUpperRight(game->blockPtr[i]).y,
+    					 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).x,
+    					 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).y,
+    					 BLACK);
+  		}
+  		else{
+  			lcd_fillRect(game->blockPtr[i]->getUpperRight(game->blockPtr[i]).x,
+   						 game->blockPtr[i]->getUpperRight(game->blockPtr[i]).y,
+    					 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).x,
+    					 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).y,
+    					 game->blockPtr[i]->getColor(game->blockPtr[i]));
+    	}
+    }
 }
 void playGame(Game* game){
 	tU16 flag = 0;

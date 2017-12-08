@@ -63,21 +63,26 @@ tU16 getRacketHeight(Racket* racket){
 tU16 getRacketSize(Racket* racket){
     return (racket->getWidth(racket) * racket->getHeight(racket));
 }
-tU16 isMovePossible(Racket* racket){
-    if(racket->gamePtr->getEdge(racket->gamePtr, left) <= racket->getLowerLeft(racket).x 
-    && racket->getUpperRight(racket).x <= racket->gamePtr->getEdge(racket->gamePtr, right))
+tU16 isMovePossibleRight(Racket* racket){
+    if(racket->getUpperRight(racket).x <= racket->gamePtr->getEdge(racket->gamePtr, right))
+        return 1;
+    else
+        return 0;
+}
+tU16 isMovePossibleLeft(Racket* racket){
+    if(racket->gamePtr->getEdge(racket->gamePtr, left) <= racket->getLowerLeft(racket).x)
         return 1;
     else
         return 0;
 }
 void moveRacketRight(Racket* racket){
-    if(!isMovePossible(racket))
+    if(!isMovePossibleRight(racket))
         return;
     racket->upperRight.x    += 1;
     racket->lowerLeft.x     += 1;
 }
 void moveRacketLeft(Racket* racket){
-    if(!isMovePossible(racket))
+    if(!isMovePossibleLeft(racket))
         return;
     racket->upperRight.x    -= 1;
     racket->lowerLeft.x     -= 1;

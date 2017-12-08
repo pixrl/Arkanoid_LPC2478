@@ -60,7 +60,8 @@ typeID getRacketId(Racket* racket);
 tU16 getRacketWidth(Racket* racket);
 tU16 getRacketHeight(Racket* racket);
 tU16 getRacketSize(Racket* racket);
-tU16 isMovePossible(Racket* racket);
+tU16 isMovePossibleRight(Racket* racket);
+tU16 isMovePossibleLeft(Racket* racket);
 void moveRacketRight(Racket* racket);
 void moveRacketLeft(Racket* racket);
 
