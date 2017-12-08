@@ -100,10 +100,9 @@ endif
 #----------------------------------------------------------------------
 W_OPTS    = -Wall -Wcast-align -Wcast-qual -Wimplicit \
             -Wnested-externs -Wpointer-arith -Wswitch \
-            -Wreturn-type 
-# -Wshadow -Wunused
-# -Wmissing-declarations -Wmissing-prototypes -Wredundant-decls -Wstrict-prototypes
-
+            -Wreturn-type -Wshadow -Wunused \
+            -Wmissing-declarations -Wmissing-prototypes -Wredundant-decls -Wstrict-prototypes
+LINKER_FLAGS = -specs=nano.specs -specs=nosys.specs
 CPU       = arm7tdmi
 OPTS      = -mcpu=$(CPU) $(THUMB_IW)
 CA_OPTS   = $(OPTS) $(INC) -DEL -DGCC $(THUMB_IW) $(T_FLAGS) $(EFLAGS) -D$(CPU_VARIANT) $(RAM_EXEC)
@@ -644,9 +643,9 @@ endif
 
 
 ifndef LD_SCRIPT_PATH
-LD_OPTS   = $(OPTS) $(EFLAGS) -nostartfiles -T $(LD_SCRIPT) -o $(NAME).elf -Wl,-Map=$(NAME).map,--cref
+LD_OPTS   = $(OPTS) $(EFLAGS) -nostartfiles -T $(LD_SCRIPT) -o $(NAME).elf -Wl,-Map=$(NAME).map,--cref $(LINKER_FLAGS)
 else
-LD_OPTS   = $(OPTS) $(EFLAGS) -nostartfiles -T $(LD_SCRIPT_PATH)/$(LD_SCRIPT) -o $(NAME).elf -Wl,-Map=$(NAME).map,--cref
+LD_OPTS   = $(OPTS) $(EFLAGS) -nostartfiles -T $(LD_SCRIPT_PATH)/$(LD_SCRIPT) -o $(NAME).elf -Wl,-Map=$(NAME).map,--cref $(LINKER_FLAGS)
 endif
 
 #----------------------------------------------------------------------

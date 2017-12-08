@@ -25,7 +25,7 @@
 #include "ea_lcd/lcd_grph.h"
 #include "delay.h"
 #include "sdram.h"
-#include "arkanoid.h"
+#include "game.h"
 #include "i2c.h"
 #include "pca9532.h"
 
@@ -274,13 +274,142 @@ void audioPoint(){
 
 
 void playAudioPoint(Game *inputGame){
-  if(soundCounter==(inputGame->player.score)-1){
-        audioPoint();
-        soundCounter++;
-          }
+  if(soundCounter==(inputGame->getScore(inputGame))-1){
+  	audioPoint();
+  	soundCounter++;
+  }
 }
+void refreshScreen(Game* game){
+	int i = 0;
+	lcd_fillRect(game->racketPtr->getUpperRight(game->racketPtr).x, 
+				 game->racketPtr->getUpperRight(game->racketPtr).y,
+				 game->racketPtr->getLowerLeft(game->racketPtr).x, 
+				 game->racketPtr->getLowerLeft(game->racketPtr).y,
+				 game->racketPtr->getColor(game->racketPtr));
+    lcd_fillcircle(game->ballPtr->getCenter(game->ballPtr).x, 
+    			   game->ballPtr->getCenter(game->ballPtr).y, 
+    			   game->ballPtr->getRadius(game->ballPtr) + 5, 
+    			   BLACK);
+  	lcd_fillcircle(game->ballPtr->getCenter(game->ballPtr).x, game->ballPtr->getCenter(game->ballPtr).y, 
+  				   game->ballPtr->getRadius(game->ballPtr), game->ballPtr->getColor(game->ballPtr));
+  	for(i = 0; i < game->getNumOfBlocks(game); ++i)
+  		lcd_fillRect(game->blockPtr[i]->getUpperRight(game->blockPtr[i]).x,
+   					 game->blockPtr[i]->getUpperRight(game->blockPtr[i]).y,
+    				 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).x,
+    				 game->blockPtr[i]->getLowerLeft(game->blockPtr[i]).y,
+    				 game->blockPtr[i]->getColor(game->blockPtr[i]));
+}
+void playGame(Game* game){
+	int i = 0;
+	tU16 flag = 0;
+	refreshScreen(game);
+    //printf("Wszystko init");
+    while(1)
+	{
+		game->moveBall(game);
+		mdelay(1);
+		refreshScreen(game);
+		if(FIO2PIN & 0x00000400)
+		{
+			if ((FIO2PIN & 0x04000000) == 0)
+			{
+				printf("\nPrawo");
+				game->racketPtr->moveRight(game->racketPtr);
+				lcd_fillRect(game->racketPtr->getLowerLeft(game->racketPtr).x, 
+							 game->racketPtr->getLowerLeft(game->racketPtr).y, 
+							 0, 
+							 game->racketPtr->getUpperRight(game->racketPtr).y, 
+							 BLACK);
+			}
 
-
+			if ((FIO2PIN & 0x00800000) == 0)
+			{
+				printf("\nLewo");
+				game->racketPtr->moveLeft(game->racketPtr);
+				lcd_fillRect(320, 
+							 game->racketPtr->getUpperRight(game->racketPtr).y, 
+							 game->racketPtr->getUpperRight(game->racketPtr).x, 
+							 game->racketPtr->getLowerLeft(game->racketPtr).y, 
+							 BLACK);		
+			}
+		}
+		switch(game->getScore(game))
+		{
+			case 1:
+				setLed(1, 1);
+        		playAudioPoint(game);
+				break;
+			case 2:
+				setLed(2, 1);
+        		playAudioPoint(game);
+				break;
+			case 3:
+				setLed(3, 1);
+        		playAudioPoint(game);
+        		break;
+			case 4:
+				setLed(4, 1);
+        		playAudioPoint(game);
+				break;
+			case 5:
+				setLed(5, 1);
+        		playAudioPoint(game);
+        		break;
+			case 6:
+				setLed(6, 1);
+       			playAudioPoint(game);
+        		break;
+			case 7:
+				setLed(7, 1);
+        		playAudioPoint(game);
+				break;
+			case 8:
+				setLed(8, 1);
+        		playAudioPoint(game);
+				break;
+			case 9:
+				setLed(1, 0);
+        		playAudioPoint(game);
+        		delayMs(100);
+				setLed(2, 0);
+        		delayMs(100);
+				setLed(3, 0);
+        		delayMs(100);
+				setLed(4, 0);
+        		delayMs(100);
+				setLed(5, 0);
+        		delayMs(100);
+				setLed(6, 0);
+        		delayMs(100);
+				setLed(7, 0);
+        		delayMs(100);
+				setLed(8, 0);
+        		delayMs(100);
+				setLed(1, 1);
+        		delayMs(100);
+				setLed(2, 1);
+        		delayMs(100);
+				setLed(3, 1);
+        		delayMs(100);
+				setLed(4, 1);
+        		delayMs(100);
+				setLed(5, 1);
+        		delayMs(100);
+				setLed(6, 1);
+        		delayMs(100);
+				setLed(7, 1);
+        		delayMs(100);
+				setLed(8, 1);
+				delayMs(100);
+				flag = 1;
+				break;
+		}
+		if(flag)
+			break;
+	}
+	lcd_fillScreen(BLACK);
+	lcd_putString(100, 160, "GAME OVER");
+}
 int main(void)
 {
   int test = 0;
@@ -410,8 +539,9 @@ static tLcdParams ea_QVGA_v2 =
   lcdInit(&ea_QVGA_v2); 
   lcdTurnOn();
   lcd_fillScreen(BLACK);
-  tU16 flag = 0;
-  Game newGame = gameInit();
+  Game *game = newGame(240, 320, 10);
+  playGame(game);
+  /*Game newGame = gameInit();
 	printf("newGame init");
 	tU16 i = 0;
 	lcd_fillRect(newGame.racket.points[UPPERRIGHT].x, newGame.racket.points[UPPERRIGHT].y, newGame.racket.points[LOWERLEFT].x, newGame.racket.points[LOWERLEFT].y, newGame.racket.color);
@@ -523,6 +653,6 @@ static tLcdParams ea_QVGA_v2 =
 			break;
 	}
 	lcd_fillScreen(BLACK);
-	lcd_putString(100, 160, "GAME OVER");
+	lcd_putString(100, 160, "GAME OVER");*/
   return 0;
 }
