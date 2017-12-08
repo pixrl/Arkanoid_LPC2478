@@ -100,8 +100,8 @@ endif
 #----------------------------------------------------------------------
 W_OPTS    = -Wall -Wcast-align -Wcast-qual -Wimplicit \
             -Wnested-externs -Wpointer-arith -Wswitch \
-            -Wreturn-type -Wshadow -Wunused \
-            -Wmissing-declarations -Wmissing-prototypes -Wredundant-decls -Wstrict-prototypes
+#           -Wreturn-type -Wshadow -Wunused 
+#           -Wmissing-declarations -Wmissing-prototypes -Wredundant-decls -Wstrict-prototypes
 LINKER_FLAGS = -specs=nano.specs -specs=nosys.specs
 CPU       = arm7tdmi
 OPTS      = -mcpu=$(CPU) $(THUMB_IW)
