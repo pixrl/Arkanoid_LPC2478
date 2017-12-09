@@ -501,6 +501,7 @@ static tLcdParams ea_QVGA_v2 =
   lcd_fillScreen(BLACK);
   Game *game = newGame(240, 320, 10);
   playGame(game);
+  deleteGame(game);
   /*Game newGame = gameInit();
 	printf("newGame init");
 	tU16 i = 0;
