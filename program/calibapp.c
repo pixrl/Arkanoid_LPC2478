@@ -17,7 +17,7 @@
 #include <string.h>
 #include "touch.h"
 #include "calibrate.h"
-#include "lcd_grph.h"
+#include "ea_lcd/lcd_grph.h"
 #include "delay.h"
 
 

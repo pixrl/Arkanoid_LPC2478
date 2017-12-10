@@ -24,6 +24,7 @@
 #include "ea_lcd/lcd_hw.h"
 #include "ea_lcd/lcd_grph.h"
 #include "delay.h"
+#include "touch.h"
 #include "sdram.h"
 #include "game.h"
 #include "i2c.h"
@@ -90,13 +91,6 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
 /*****************************************************************************
  *
  * Description:
- *    Generate a random number.
- *
- ****************************************************************************/
-
-/*****************************************************************************
- *
- * Description:
  *    Sound arrays declaration
  *
  ****************************************************************************/
@@ -104,17 +98,7 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
 extern char wavSound[];
 
 tU32 wavSoundSize();
-
-/*****************************************************************************
- *
- * Description:
- *    The main-function. 
- *
- * Returns:
- *    Always 0, since return value is not used.
- *
- ****************************************************************************/
-                                          
+                                 
                                          /* TIMERS */
 static void delayMs(tU16 delayInMs)
 {
@@ -230,6 +214,13 @@ void playAudioPoint(Game *inputGame){
   	soundCounter++;
   }
 }
+
+/*****************************************************************************
+ *
+ * Description:
+ *    Functions representing logic of the game
+ *
+ ****************************************************************************/
 void refreshScreen(Game* game){
 	int i = 0;
 	lcd_fillRect(game->racketPtr->getUpperRight(game->racketPtr).x, 
@@ -261,6 +252,7 @@ void refreshScreen(Game* game){
     	}
     }
 }
+
 void playGame(Game* game){
 	tU16 flag = 0;
 	refreshScreen(game);
@@ -371,50 +363,65 @@ void playGame(Game* game){
 	lcd_fillScreen(BLACK);
 	lcd_putString(100, 160, "GAME OVER");
 }
+void drawMenu(){
+	//void lcd_picture(tU16 x, tU16 y, tU16 width, tU16 height, tU16 *pPicture);
+	int x,y,z = 0;
+	while(1){
+		touch_xyz(&x, &y, &z);
+		/*if(0<x && x<x_0 && 0<y && y<y_0)
+			break;*/
+			break;
+	}
+}
+
+/*****************************************************************************
+ *
+ * Description:
+ *    The main-function. 
+ *
+ * Returns:
+ *    Always 0, since return value is not used.
+ *
+ ****************************************************************************/
+ 
 int main(void)
 {
-  //joystick
-  IODIR1 |= 0x38000000;
-  IOCLR1 |= 0x38000000;
-  PINSEL3 = 0;
-  
-  
-  //i2c
-  //IODIR0  |= 0x000F8000; 
-  //IODIR1  |= 0xFFF00000;
-  //FIO2DIR |= 0x0000FFFF;
+	//joystick
+	IODIR1 |= 0x38000000;
+	IOCLR1 |= 0x38000000;
+	PINSEL3 = 0;
 
-  //Sound
+	//i2c
+	//IODIR0  |= 0x000F8000; 
+	//IODIR1  |= 0xFFF00000;
+	//FIO2DIR |= 0x0000FFFF;
 
+	//Sound
+
+	PINSEL1 &= ~0x00300000;
+	PINSEL1 |=  0x00200000;
+
+	pData = (short*)&wavSound[0];
+	size = wavSoundSize();
+
+	eaInit();
+	i2cInit();
+	//initialize PCA9532
+	tU8 initCommand[] = {0x12, 0x97, 0x80, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
+	pca9532(initCommand, sizeof(initCommand), NULL, 0);
+	//initialize printf()-functionality
+	// initialize external SDRAM
+	sdramInit();
   
-  
-
-  PINSEL1 &= ~0x00300000;
-  PINSEL1 |=  0x00200000;
-
-  pData = (short*)&wavSound[0];
-  size = wavSoundSize();
-
-
-  eaInit();
-  i2cInit();
-  //initialize PCA9532
-  tU8 initCommand[] = {0x12, 0x97, 0x80, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
-  pca9532(initCommand, sizeof(initCommand), NULL, 0);
-  //initialize printf()-functionality
-  // initialize external SDRAM
-  sdramInit();
-  
-  
-  //print welcome message
-  printf("\n*********************************************************");
-  printf("\n*");
-  printf("\n* (C) 2008 Embedded Artists AB");
-  printf("\n*");
-  printf("\n* Welcome to this program that demonstrates how to use the");
-  printf("\n* LCD QVGA.");
-  printf("\n*");
-  printf("\n*********************************************************\n\n");
+	//print welcome message
+	printf("\n*********************************************************");
+	printf("\n*");
+	printf("\n* (C) 2008 Embedded Artists AB");
+	printf("\n*");
+	printf("\n* Welcome to this program that demonstrates how to use the");
+	printf("\n* LCD QVGA.");
+	printf("\n*");
+	printf("\n*********************************************************\n\n");
 
 #if 0  
 static tLcdParams ea_QVGA_v2 =
@@ -441,179 +448,70 @@ static tLcdParams ea_QVGA_v2 =
   
 #ifdef TEST_LCDPARAMS
   
-  printf("Horizontal back porch (%d):\t", ea_QVGA_v2.hbp);
-  ea_QVGA_v2.hbp = consolGetIntNum();
+	printf("Horizontal back porch (%d):\t", ea_QVGA_v2.hbp);
+	ea_QVGA_v2.hbp = consolGetIntNum();
   
-  printf("Horizontal front porch (%d):\t", ea_QVGA_v2.hfp);
-  ea_QVGA_v2.hfp = consolGetIntNum();  
+	printf("Horizontal front porch (%d):\t", ea_QVGA_v2.hfp);
+	ea_QVGA_v2.hfp = consolGetIntNum();  
   
-  printf("HSYNC pulse width (%d):\t\t", ea_QVGA_v2.hsw);
-  ea_QVGA_v2.hsw = consolGetIntNum();    
+	printf("HSYNC pulse width (%d):\t\t", ea_QVGA_v2.hsw);
+	ea_QVGA_v2.hsw = consolGetIntNum();    
   
-  printf("Pixels per line (%d):\t\t", ea_QVGA_v2.ppl);
-  ea_QVGA_v2.ppl = consolGetIntNum();      
+	printf("Pixels per line (%d):\t\t", ea_QVGA_v2.ppl);
+	ea_QVGA_v2.ppl = consolGetIntNum();      
   
-  printf("Vertical back porch (%d):\t", ea_QVGA_v2.vbp);
-  ea_QVGA_v2.vbp = consolGetIntNum();        
+	printf("Vertical back porch (%d):\t", ea_QVGA_v2.vbp);
+	ea_QVGA_v2.vbp = consolGetIntNum();        
   
-  printf("Vertical front porch (%d):\t", ea_QVGA_v2.vfp);
-  ea_QVGA_v2.vfp = consolGetIntNum();  
+	printf("Vertical front porch (%d):\t", ea_QVGA_v2.vfp);
+	ea_QVGA_v2.vfp = consolGetIntNum();  
   
-  printf("VSYNC pulse width (%d):\t\t", ea_QVGA_v2.vsw);
-  ea_QVGA_v2.vsw = consolGetIntNum();    
+	printf("VSYNC pulse width (%d):\t\t", ea_QVGA_v2.vsw);
+	ea_QVGA_v2.vsw = consolGetIntNum();    
   
-  printf("Lines per panel (%d):\t\t", ea_QVGA_v2.lpp);
-  ea_QVGA_v2.lpp = consolGetIntNum();     
+	printf("Lines per panel (%d):\t\t", ea_QVGA_v2.lpp);
+	ea_QVGA_v2.lpp = consolGetIntNum();     
   
-  printf("Invert ouput enable (%d):\t", ea_QVGA_v2.ioe);
-  ea_QVGA_v2.ioe = consolGetIntNum();       
+	printf("Invert ouput enable (%d):\t", ea_QVGA_v2.ioe);
+	ea_QVGA_v2.ioe = consolGetIntNum();       
   
-  printf("Invert panel clock (%d):\t\t", ea_QVGA_v2.ipc);
-  ea_QVGA_v2.ipc = consolGetIntNum();   
+	printf("Invert panel clock (%d):\t\t", ea_QVGA_v2.ipc);
+	ea_QVGA_v2.ipc = consolGetIntNum();   
   
-  printf("Invert HSYNC (%d):\t\t", ea_QVGA_v2.ihs);
-  ea_QVGA_v2.ihs = consolGetIntNum();   
+	printf("Invert HSYNC (%d):\t\t", ea_QVGA_v2.ihs);
+	ea_QVGA_v2.ihs = consolGetIntNum();   
   
-  printf("Invert VSYNC (%d):\t\t", ea_QVGA_v2.ivs);
-  ea_QVGA_v2.ivs = consolGetIntNum();   
+	printf("Invert VSYNC (%d):\t\t", ea_QVGA_v2.ivs);
+	ea_QVGA_v2.ivs = consolGetIntNum();   
   
   
-  printf("\n\nThe display will be initialized with the following values\n\n");  
+	printf("\n\nThe display will be initialized with the following values\n\n");  
   
-  printf("Horizontal back porch:\t%d\n", ea_QVGA_v2.hbp);  
-  printf("Horizontal front porch:\t%d\n", ea_QVGA_v2.hfp); 
-  printf("HSYNC pulse width:\t%d\n", ea_QVGA_v2.hsw);  
-  printf("Pixels per line:\t%d\n", ea_QVGA_v2.ppl);
-  printf("Vertical back porch:\t%d\n", ea_QVGA_v2.vbp);
-  printf("Vertical front porch:\t%d\n", ea_QVGA_v2.vfp);
-  printf("VSYNC pulse width:\t%d\n", ea_QVGA_v2.vsw); 
-  printf("Lines per panel:\t%d\n", ea_QVGA_v2.lpp);
-  printf("Invert ouput enable:\t%d\n", ea_QVGA_v2.ioe);  
-  printf("Invert panel clock:\t%d\n", ea_QVGA_v2.ipc);
-  printf("Invert HSYNC:\t\t%d\n", ea_QVGA_v2.ihs); 
-  printf("Invert VSYNC:\t\t%d\n", ea_QVGA_v2.ivs);
+	printf("Horizontal back porch:\t%d\n", ea_QVGA_v2.hbp);  
+	printf("Horizontal front porch:\t%d\n", ea_QVGA_v2.hfp); 
+	printf("HSYNC pulse width:\t%d\n", ea_QVGA_v2.hsw);  
+	printf("Pixels per line:\t%d\n", ea_QVGA_v2.ppl);
+	printf("Vertical back porch:\t%d\n", ea_QVGA_v2.vbp);
+	printf("Vertical front porch:\t%d\n", ea_QVGA_v2.vfp);
+	printf("VSYNC pulse width:\t%d\n", ea_QVGA_v2.vsw); 
+	printf("Lines per panel:\t%d\n", ea_QVGA_v2.lpp);
+	printf("Invert ouput enable:\t%d\n", ea_QVGA_v2.ioe);  
+	printf("Invert panel clock:\t%d\n", ea_QVGA_v2.ipc);
+	printf("Invert HSYNC:\t\t%d\n", ea_QVGA_v2.ihs); 
+	printf("Invert VSYNC:\t\t%d\n", ea_QVGA_v2.ivs);
   
 #endif
-  //initialize LCD  
+	//initialize LCD  
 
-  lcdInit(&ea_QVGA_v2); 
-  lcdTurnOn();
-  lcd_fillScreen(BLACK);
-  Game *game = newGame(240, 320, 10);
-  playGame(game);
-  deleteGame(game);
-  /*Game newGame = gameInit();
-	printf("newGame init");
-	tU16 i = 0;
-	lcd_fillRect(newGame.racket.points[UPPERRIGHT].x, newGame.racket.points[UPPERRIGHT].y, newGame.racket.points[LOWERLEFT].x, newGame.racket.points[LOWERLEFT].y, newGame.racket.color);
-	lcd_fillcircle(newGame.ball.center.x, newGame.ball.center.y, newGame.ball.radius, newGame.ball.color);
-	for(i = 0; i < NUM_OF_BLOCKS; ++i)
-	{
-		lcd_fillRect(newGame.blocks[i].points[UPPERRIGHT].x, newGame.blocks[i].points[UPPERRIGHT].y, newGame.blocks[i].points[LOWERLEFT].x, newGame.blocks[i].points[LOWERLEFT].y, newGame.blocks[i].color);
-	}
-	printf("Wszystko init");
-	while(1)
-	{
-		printf("WHILE");
-		moveBall(&newGame);
-		lcd_fillcircle(newGame.ball.center.x, newGame.ball.center.y, newGame.ball.radius + 5, BLACK);
-		for(i = 0; i < NUM_OF_BLOCKS; ++i)
-			lcd_fillRect(newGame.blocks[i].points[UPPERRIGHT].x, newGame.blocks[i].points[UPPERRIGHT].y, newGame.blocks[i].points[LOWERLEFT].x, newGame.blocks[i].points[LOWERLEFT].y, newGame.blocks[i].color);
-		lcd_fillcircle(newGame.ball.center.x, newGame.ball.center.y, newGame.ball.radius, newGame.ball.color);
-		mdelay(1);
-		lcd_fillRect(newGame.racket.points[UPPERRIGHT].x, newGame.racket.points[UPPERRIGHT].y, newGame.racket.points[LOWERLEFT].x, newGame.racket.points[LOWERLEFT].y, newGame.racket.color);
-		if(FIO2PIN & 0x00000400)
-		{
-			if ((FIO2PIN & 0x04000000) == 0)
-			{
-				printf("\nPrawo");
-				moveRacket(&newGame, RACKET_MOVE_RIGHT);
-				lcd_fillRect(newGame.racket.points[LOWERLEFT].x, newGame.racket.points[LOWERLEFT].y, 0, newGame.racket.points[UPPERRIGHT].y, BLACK);
-			}
-
-			if ((FIO2PIN & 0x00800000) == 0)
-			{
-				printf("\nLewo");
-				moveRacket(&newGame, RACKET_MOVE_LEFT);
-				lcd_fillRect(320, newGame.racket.points[UPPERRIGHT].y, newGame.racket.points[UPPERRIGHT].x, newGame.racket.points[LOWERLEFT].y, BLACK);		
-			}
-		}
-
-		switch(newGame.player.score)
-		{
-			case 1:
-				setLed(1, 1);
-        playAudioPoint(&newGame);
-				break;
-			case 2:
-				setLed(2, 1);
-        playAudioPoint(&newGame);
-				break;
-			case 3:
-				setLed(3, 1);
-        playAudioPoint(&newGame);
-        break;
-			case 4:
-				setLed(4, 1);
-        playAudioPoint(&newGame);
-				break;
-			case 5:
-				setLed(5, 1);
-        playAudioPoint(&newGame);
-        break;
-			case 6:
-				setLed(6, 1);
-        playAudioPoint(&newGame);
-        break;
-			case 7:
-				setLed(7, 1);
-        playAudioPoint(&newGame);
-				break;
-			case 8:
-				setLed(8, 1);
-        playAudioPoint(&newGame);
-				break;
-			case 9:
-				setLed(1, 0);
-        playAudioPoint(&newGame);
-        delayMs(100);
-				setLed(2, 0);
-        delayMs(100);
-				setLed(3, 0);
-        delayMs(100);
-				setLed(4, 0);
-        delayMs(100);
-				setLed(5, 0);
-        delayMs(100);
-				setLed(6, 0);
-        delayMs(100);
-				setLed(7, 0);
-        delayMs(100);
-				setLed(8, 0);
-        delayMs(100);
-				setLed(1, 1);
-        delayMs(100);
-				setLed(2, 1);
-        delayMs(100);
-				setLed(3, 1);
-        delayMs(100);
-				setLed(4, 1);
-        delayMs(100);
-				setLed(5, 1);
-        delayMs(100);
-				setLed(6, 1);
-        delayMs(100);
-				setLed(7, 1);
-        delayMs(100);
-				setLed(8, 1);
-				delayMs(100);
-				flag = 1;
-				break;
-		}
-		if(flag)
-			break;
-	}
+	lcdInit(&ea_QVGA_v2); 
+	lcdTurnOn();
+	touch_init();
+	calibrateStart();
+  
+	drawMenu();
 	lcd_fillScreen(BLACK);
-	lcd_putString(100, 160, "GAME OVER");*/
-  return 0;
+	Game *game = newGame(240, 320, 10);
+	playGame(game);
+	deleteGame(game);
+	return 0;
 }
