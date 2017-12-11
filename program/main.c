@@ -97,6 +97,8 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
 
 extern char wavSound[];
 
+extern unsigned short imageArkanoid[];
+
 tU32 wavSoundSize();
                                  
                                          /* TIMERS */
@@ -364,12 +366,11 @@ void playGame(Game* game){
 	lcd_putString(100, 160, "GAME OVER");
 }
 void drawMenu(){
-	//void lcd_picture(tU16 x, tU16 y, tU16 width, tU16 height, tU16 *pPicture);
+	lcd_picture(0, 0, 240, 320, imageArkanoid);
 	int x,y,z = 0;
 	while(1){
 		touch_xyz(&x, &y, &z);
-		/*if(0<x && x<x_0 && 0<y && y<y_0)
-			break;*/
+		if(34<x && x<199 && 0<208 && y<270)
 			break;
 	}
 }
