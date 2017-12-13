@@ -511,7 +511,9 @@ static tLcdParams ea_QVGA_v2 =
   
 	drawMenu();
 	lcd_fillScreen(BLACK);
-	Game *game = newGame(240, 320, 10);
+	srand(RTC_MIN*RTC_HOUR*RTC_DOM*RTC_MONTH*RTC_YEAR);
+	tU16 numOfBlocks = rand() % 20;
+	Game *game = newGame(240, 320, numOfBlocks);
 	playGame(game);
 	deleteGame(game);
 	return 0;
