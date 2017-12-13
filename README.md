@@ -6,10 +6,6 @@ Implementacja Arkanoida w mikrokontrolerze NXP LPC2478
 
 * ### Poprawić piłkę
 
-* ### Odwrócić pole gry
-
-* ### Dodać touch screen
-
 * ### Dodać dźwięki do innych akcji
 
 # Wykonane funkcjonalności:
@@ -19,6 +15,6 @@ Implementacja Arkanoida w mikrokontrolerze NXP LPC2478
 * ### Joystick
 * ### Sound
 * ### Timer
-* ### Sdram
-* ### ????
-* ### ????
+* ### Przewania
+* ### Touchscreen
+* ### RTC
