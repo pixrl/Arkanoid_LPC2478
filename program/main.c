@@ -370,7 +370,7 @@ void drawMenu(){
 	int x,y,z = 0;
 	while(1){
 		touch_xyz(&x, &y, &z);
-		if(34<x && x<199 && 0<208 && y<270)
+		if(34<x && x<199 && 208<y && y<270)
 			break;
 	}
 }
