@@ -15,6 +15,6 @@ Implementacja Arkanoida w mikrokontrolerze NXP LPC2478
 * ### Joystick
 * ### Sound
 * ### Timer
-* ### Przewania
+* ### Przerwania
 * ### Touchscreen
 * ### RTC
