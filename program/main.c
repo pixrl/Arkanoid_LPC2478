@@ -33,7 +33,8 @@
 /******************************************************************************
  * Defines and typedefs
  *****************************************************************************/
-
+tU16 previousScore = 0;
+#define MENU_DELAY 1000
 /*
  * Enabled this define if you would like to test different values
  * for the LCD parameters. You will be able to input the values
@@ -97,7 +98,9 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
 
 extern char wavSound[];
 
-extern unsigned short imageArkanoid[];
+extern unsigned short arkanoid_menu_mirror[];
+extern unsigned short arkanoid_settings_mirror[];
+extern unsigned short arkanoid_success_mirror[];
 
 tU32 wavSoundSize();
                                  
@@ -216,7 +219,20 @@ void playAudioPoint(Game *inputGame){
   	soundCounter++;
   }
 }
-
+void setRTC(unsigned long *rtcValue, tU16 isAdd){
+	if(isAdd){
+		(*rtcValue)++;
+		printf("\n%d",*rtcValue);
+	}
+	else{
+		(*rtcValue)--;
+		printf("\n%d", *rtcValue);
+	}
+}
+/*void showRTC(){
+	lcd_putString(100, 160, "GAME OVER");
+	RTC_HOUR RTC_MIN RTC_SEC
+}*/
 /*****************************************************************************
  *
  * Description:
@@ -254,11 +270,140 @@ void refreshScreen(Game* game){
     	}
     }
 }
-
+void lcdShowPicture(unsigned short *image){
+	  unsigned short* buffer = (unsigned short*) LCD_FRAME_BUFFER;
+	  int i, j, k=0;
+	  for (i=239;i>-1;i--)
+	  {
+		  for (j=i;j<76800;j+=240)
+		    {
+		  	  buffer[j] = image[k];
+		  	  k++;
+		    }
+	  }
+}
+tU16 ifScored(Game *game)
+{
+	if(game->getScore(game) != previousScore){
+		previousScore = game->getScore(game);
+		return 1;
+	}
+	return 0;
+}
+void setLedScore(Game *game){
+	switch(game->getScore(game))
+	{
+	case 1:
+		setLed(1, 1);
+		setLed(2, 0);
+		setLed(3, 0);
+		setLed(4, 0);
+		break;
+	case 2:
+		setLed(1, 0);
+		setLed(2, 1);
+		setLed(3, 0);
+		setLed(4, 0);
+		break;
+	case 3:
+		setLed(1, 1);
+		setLed(2, 1);
+		setLed(3, 0);
+		setLed(4, 0);
+		break;
+	case 4:
+		setLed(1, 0);
+		setLed(2, 0);
+		setLed(3, 1);
+		setLed(4, 0);
+		break;
+	case 5:
+		setLed(1, 1);
+		setLed(2, 0);
+		setLed(3, 1);
+		setLed(4, 0);
+		break;
+	case 6:
+		setLed(1, 0);
+		setLed(2, 1);
+		setLed(3, 1);
+		setLed(4, 0);
+		break;
+	case 7:
+		setLed(1, 1);
+		setLed(2, 1);
+		setLed(3, 1);
+		setLed(4, 0);
+		break;
+	case 8:
+		setLed(1, 0);
+		setLed(2, 0);
+		setLed(3, 0);
+		setLed(4, 1);
+		break;
+	case 9:
+		setLed(1, 1);
+		setLed(2, 0);
+		setLed(3, 0);
+		setLed(4, 1);
+		break;
+	case 10:
+		setLed(1, 0);
+		setLed(2, 1);
+		setLed(3, 0);
+		setLed(4, 1);
+		break;
+	case 11:
+		setLed(1, 1);
+		setLed(2, 1);
+		setLed(3, 0);
+		setLed(4, 1);
+		break;
+	case 12:
+		setLed(1, 0);
+		setLed(2, 0);
+		setLed(3, 1);
+		setLed(4, 1);
+		break;
+	case 13:
+		setLed(1, 1);
+		setLed(2, 0);
+		setLed(3, 1);
+		setLed(4, 1);
+		break;
+	case 14:
+		setLed(1, 0);
+		setLed(2, 1);
+		setLed(3, 1);
+		setLed(4, 1);
+		break;
+	case 15:
+		setLed(1, 1);
+		setLed(2, 1);
+		setLed(3, 1);
+		setLed(4, 1);
+		break;
+	default:
+		setLed(1, 0);
+		setLed(2, 0);
+		setLed(3, 0);
+		setLed(4, 0);
+		break;
+	}
+	playAudioPoint(game);
+	setLed(5, 1);
+	setLed(6, 1);
+	setLed(7, 1);
+	setLed(8, 1);
+	setLed(5, 0);
+	setLed(6, 0);
+	setLed(7, 0);
+	setLed(8, 0);
+}
 void playGame(Game* game){
+	lcd_fillScreen(BLACK);
 	tU16 flag = 0;
 	refreshScreen(game);
-    //printf("Wszystko init");
     while(1)
 	{
 		game->moveBall(game);
@@ -288,93 +433,91 @@ void playGame(Game* game){
 							 BLACK);		
 			}
 		}
-		switch(game->getScore(game))
+		if(ifScored(game))
 		{
-			case 1:
-				setLed(1, 1);
-        		playAudioPoint(game);
-				break;
-			case 2:
-				setLed(2, 1);
-        		playAudioPoint(game);
-				break;
-			case 3:
-				setLed(3, 1);
-        		playAudioPoint(game);
-        		break;
-			case 4:
-				setLed(4, 1);
-        		playAudioPoint(game);
-				break;
-			case 5:
-				setLed(5, 1);
-        		playAudioPoint(game);
-        		break;
-			case 6:
-				setLed(6, 1);
-       			playAudioPoint(game);
-        		break;
-			case 7:
-				setLed(7, 1);
-        		playAudioPoint(game);
-				break;
-			case 8:
-				setLed(8, 1);
-        		playAudioPoint(game);
-				break;
-			case 9:
-				setLed(1, 0);
-        		playAudioPoint(game);
-        		delayMs(100);
-				setLed(2, 0);
-        		delayMs(100);
-				setLed(3, 0);
-        		delayMs(100);
-				setLed(4, 0);
-        		delayMs(100);
-				setLed(5, 0);
-        		delayMs(100);
-				setLed(6, 0);
-        		delayMs(100);
-				setLed(7, 0);
-        		delayMs(100);
-				setLed(8, 0);
-        		delayMs(100);
-				setLed(1, 1);
-        		delayMs(100);
-				setLed(2, 1);
-        		delayMs(100);
-				setLed(3, 1);
-        		delayMs(100);
-				setLed(4, 1);
-        		delayMs(100);
-				setLed(5, 1);
-        		delayMs(100);
-				setLed(6, 1);
-        		delayMs(100);
-				setLed(7, 1);
-        		delayMs(100);
-				setLed(8, 1);
-				delayMs(100);
-				flag = 1;
-				break;
+			setLedScore(game);
 		}
-		if(flag)
+		if(game->getNumOfBlocks(game) == game->getScore(game))
 			break;
 	}
 	lcd_fillScreen(BLACK);
 	lcd_putString(100, 160, "GAME OVER");
 }
-void drawMenu(){
-	lcd_picture(0, 0, 240, 320, imageArkanoid);
+void drawMenu(Game *game){
+	lcdShowPicture(arkanoid_menu_mirror);
 	int x,y,z = 0;
+	mdelay(MENU_DELAY);
 	while(1){
 		touch_xyz(&x, &y, &z);
-		if(34<x && x<199 && 208<y && y<270)
+		if(25 < x && x < 210 && 170 < y && y < 225)
 			break;
+		if(26 < x && x < 208 && 256 < y && y < 288){
+			drawSettings(game);
+			continue;
+		}
 	}
 }
-
+void drawSettings(Game *game){
+	lcdShowPicture(arkanoid_settings_mirror);
+	int x,y,z = 0;
+	mdelay(MENU_DELAY);
+	while(1){
+		touch_xyz(&x, &y, &z);
+		if(30<x && x<211 && 67 < y && y < 120){
+			drawSetTime();
+			drawSuccess();
+			continue;
+		}
+		if(54 < x && x < 73 && 208 < y && y < 227){
+			game->racketPtr->setColor(game->racketPtr, RED);
+			drawSuccess();
+		}
+		if(105 < x && x < 124 && 208 < y && y < 227){
+			game->racketPtr->setColor(game->racketPtr, GREEN);
+			drawSuccess();
+		}
+		if(158 < x && x < 177 && 208 < y && y < 227){
+			game->racketPtr->setColor(game->racketPtr, BLUE);
+			drawSuccess();
+		}
+		if(34 < x && x < 210 && 258 < y && y < 286){
+			break;
+		}
+	}
+	lcdShowPicture(arkanoid_menu_mirror);
+}
+void drawSuccess(){
+	lcdShowPicture(arkanoid_success_mirror);
+	int x,y,z = 0;
+	mdelay(MENU_DELAY);
+	while(1){
+		touch_xyz(&x, &y, &z);
+		if(0<x && x<240 && 0<y && y<320)
+			break;
+	}
+	lcdShowPicture(arkanoid_settings_mirror);
+}
+void drawSetTime(){
+	int x,y,z = 0;
+	char rtcString[20];
+	while(1){
+		lcd_fillScreen(BLACK);
+		snprintf(rtcString, 20, "%2ld:%2ld:%2ld", RTC_HOUR, RTC_MIN, RTC_SEC);
+		lcd_putString(100, 160, rtcString);
+		while(1){
+			touch_xyz(&x, &y, &z);
+			if(0<x && x<120 && 0<y && y<320){
+			
+				break;
+			}
+			if(180 < x && x < 240 && 0<y && y<320){
+			
+				break;
+			}
+		}
+		mdelay(MENU_DELAY);
+	}
+}
 /*****************************************************************************
  *
  * Description:
@@ -508,12 +651,10 @@ static tLcdParams ea_QVGA_v2 =
 	lcdTurnOn();
 	touch_init();
 	calibrateStart();
-  
-	drawMenu();
-	lcd_fillScreen(BLACK);
-	srand(RTC_MIN*RTC_HOUR*RTC_DOM*RTC_MONTH*RTC_YEAR);
-	tU16 numOfBlocks = rand() % 20;
+	srand(RTC_SEC);
+	tU16 numOfBlocks = 9 + rand() % 5;
 	Game *game = newGame(240, 320, numOfBlocks);
+	drawMenu(game);
 	playGame(game);
 	deleteGame(game);
 	return 0;

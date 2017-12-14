@@ -60,7 +60,6 @@ tU16 getGameDistanceFromEdge(Game* game, typeEdges edge){
 }
 Ball* ballInit(Game* game, Point m_lowCenter, tU16 m_height, tU16 m_radius, tU16 m_color){
     Point* center = newPoint(m_lowCenter.x, m_lowCenter.y - (m_height + m_height + m_radius));
-    srand(RTC_MIN*RTC_HOUR*RTC_DOM*RTC_MONTH*RTC_YEAR);
     Direction* customDirection = newDirection((rand() % 2 ? -1 : 1), -1);
     Ball* ball = newBall(*center, m_radius, m_color, *customDirection, game);
     deleteDirection(customDirection);
@@ -69,6 +68,7 @@ Ball* ballInit(Game* game, Point m_lowCenter, tU16 m_height, tU16 m_radius, tU16
 }
 void blocksInit(Game* game, tU16 numOfBlocks, tU16 blockWidth, tU16 blockHeight, Block** blocks){
     int i;
+    tU16 blockCounter = 1;
     Point* m_upperRight = newPoint((game->distanceFromEdge[left] + blockWidth), game->distanceFromEdge[bottom] + blockHeight);
     Point* m_lowerLeft = newPoint((game->distanceFromEdge[left]), game->distanceFromEdge[bottom]);
     tU16 numOfCols = 3;
@@ -76,13 +76,14 @@ void blocksInit(Game* game, tU16 numOfBlocks, tU16 blockWidth, tU16 blockHeight,
         blocks[i] = newBlock(*m_upperRight, *m_lowerLeft, PURPLE, game);
         m_upperRight->set_x(m_upperRight, m_upperRight->get_x(m_upperRight) + DISTANCE_BETWEEN_BLOCKS_X + blockWidth);
         m_lowerLeft->set_x(m_lowerLeft, m_lowerLeft->get_x(m_lowerLeft) + DISTANCE_BETWEEN_BLOCKS_X + blockWidth);
-        if(i % numOfCols == 0 && i != 0)
+        if(blockCounter % numOfCols == 0)
         {
             m_upperRight->set_x(m_upperRight, game->distanceFromEdge[left] + blockWidth);
             m_lowerLeft->set_x(m_lowerLeft, game->distanceFromEdge[left]);
             m_upperRight->set_y(m_upperRight, m_upperRight->get_y(m_upperRight) + blockHeight + DISTANCE_BETWEEN_BLOCKS_Y);
             m_lowerLeft->set_y(m_lowerLeft, m_lowerLeft->get_y(m_lowerLeft) + blockHeight + DISTANCE_BETWEEN_BLOCKS_Y);
         }
+        blockCounter++;
     }
     deletePoint(m_upperRight);
     deletePoint(m_lowerLeft);
