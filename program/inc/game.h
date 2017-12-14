@@ -36,6 +36,8 @@ typedef tU16 (*getGameHeightFunc)(Game* game);
 typedef tU16 (*getGameNumOfBlocksFunc)(Game* game);
 typedef tU16 (*getEdgeFunc)(Game* game, typeEdges edge);
 typedef tU16 (*getDistanceFromEdgeFunc)(Game* game, typeEdges edge);
+typedef tU16 (*isGameLostFunc)(Game* game);
+typedef void (*setGameLostFunc)(Game* game);
 typedef void (*moveTheBallFunc)(Game* game);
 
 struct m_game{
@@ -46,6 +48,8 @@ struct m_game{
     getGameNumOfBlocksFunc getNumOfBlocks;
     getEdgeFunc getEdge;
     getDistanceFromEdgeFunc getDistanceFromEdge;
+    isGameLostFunc isLost;
+    setGameLostFunc setLost;
     moveTheBallFunc moveBall;
     Ball* ballPtr;
     Block* blockPtr[BLOCKS_MAX];
@@ -56,6 +60,7 @@ struct m_game{
     tU16 numOfBlocks;
     tU16 edges[NUM_OF_EDGES];
     tU16 distanceFromEdge[NUM_OF_EDGES];
+    tU16 gameLost;
 };
 
 Game* newGame(tU16 m_width, tU16 m_height, tU16 m_numOfBlocks);
@@ -67,6 +72,8 @@ tU16 getGameHeight(Game* game);
 tU16 getGameNumOfBlocks(Game* game);
 tU16 getGameEdge(Game* game, typeEdges edge);
 tU16 getGameDistanceFromEdge(Game* game, typeEdges edge);
+tU16 isGameLost(Game* game);
+void setGameLost(Game* game);
 Racket* racketInit(Game* game, Point m_lowCenter, tU16 m_width, tU16 m_height, tU16 m_color);
 void blocksInit(Game* game, tU16 numOfBlocks, tU16 blockWidth, tU16 blockHeight, Block** blocks);
 Ball* ballInit(Game* game, Point m_lowCenter, tU16 m_height, tU16 m_radius, tU16 m_color);

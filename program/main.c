@@ -457,7 +457,7 @@ tU16 ifScored(Game *game){
 void playGame(Game* game){
 	lcd_fillScreen(BLACK);
 	refreshScreen(game);
-    while(1)
+    while(!game->isLost(game))
 	{
 		game->moveBall(game);
 		mdelay(1);

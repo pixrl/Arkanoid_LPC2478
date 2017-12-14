@@ -14,6 +14,7 @@ Game* newGame(tU16 m_width, tU16 m_height, tU16 m_numOfBlocks){
     game->distanceFromEdge[left] = DISTANCEFROMTHELEFTEDGE;
     game->distanceFromEdge[bottom] = DISTANCEFROMTHEBOTTOMEDGE;
     game->distanceFromEdge[top] = DISTANCEFROMTHEUPEDGE;
+    game->gameLost = 0;
     game->addPointToGameScore = addPointToGameScore;
     game->getScore = getGameScore;
     game->getWidth = getGameWidth;
@@ -21,6 +22,8 @@ Game* newGame(tU16 m_width, tU16 m_height, tU16 m_numOfBlocks){
     game->getNumOfBlocks = getGameNumOfBlocks;
     game->getEdge = getGameEdge;
     game->getDistanceFromEdge = getGameDistanceFromEdge;
+    game->isLost = isGameLost;
+    game->setLost = setGameLost;
     game->moveBall = moveTheBall;
     Point* lowPoint = newPoint(game->width/2, game->height - (game->distanceFromEdge[top]));
     game->racketPtr = racketInit(game, *lowPoint, LENGTH_OF_RACKET_X, LENGTH_OF_RACKET_Y, PURPLE);
@@ -57,6 +60,12 @@ tU16 getGameEdge(Game* game, typeEdges edge){
 }
 tU16 getGameDistanceFromEdge(Game* game, typeEdges edge){
     return game->distanceFromEdge[edge];
+}
+tU16 isGameLost(Game* game){
+    return game->gameLost;
+}
+void setGameLost(Game* game){
+    game->gameLost = !game->gameLost;
 }
 Ball* ballInit(Game* game, Point m_lowCenter, tU16 m_height, tU16 m_radius, tU16 m_color){
     Point* center = newPoint(m_lowCenter.x, m_lowCenter.y - (m_height + m_height + m_radius));
@@ -128,8 +137,10 @@ void testCollisionEdgeBall(Game* game){
         game->ballPtr->direction.x *= -1;
     if((game->ballPtr->center.x + game->ballPtr->radius) <= game->getEdge(game, right))
         game->ballPtr->direction.x *= -1;
-    if((game->ballPtr->center.y + game->ballPtr->radius) >= game->getEdge(game, top))
-        game->ballPtr->direction.y *= -1;
+    if((game->ballPtr->center.y + game->ballPtr->radius) >= game->getEdge(game, top)){
+    	game->ballPtr->direction.y *= -1;
+        game->setLost(game);
+    }
     if((game->ballPtr->center.y - game->ballPtr->radius) <= game->getEdge(game, bottom))
         game->ballPtr->direction.y *= -1;
     return;
@@ -178,34 +189,3 @@ void moveTheBall(Game* game){
     game->ballPtr->moveBall(game->ballPtr);
     return;
 }
-/*void blocksInit(Block **newBlocks)
-{
-	tU16 blockIndex = 0;
-	tU16 initBlock_x0	= DISTANCEFROMTHELEFTEDGE + LENGTH_OF_BLOCK_X;
-	tU16 initBlock_y0	= DISTANCEFROMTHEBOTTOMEDGE + LENGTH_OF_BLOCK_Y;
-	tU16 initBlock_x1	= DISTANCEFROMTHELEFTEDGE;
-	tU16 initBlock_y1	= DISTANCEFROMTHEBOTTOMEDGE;
-	tU16 coordinateBlock_x0 = initBlock_x0;
-	tU16 coordinateBlock_y0 = initBlock_y0;
-	tU16 coordinateBlock_x1 = initBlock_x1;
-	tU16 coordinateBlock_y1 = initBlock_y1;
-	Point *m_upperRight;
-    Point *m_lowerLeft;
-	for(blockIndex = 0; blockIndex < NUM_OF_BLOCKS; ++blockIndex){
-        m_upperRight = newPoint(coordinateBlock_x0, coordinateBlock_y0);
-        m_lowerLeft  = newPoint(coordinateBlock_x1, coordinateBlock_y1);
-		newBlocks[blockIndex] = newBlock(*m_upperRight, *m_lowerLeft, COLOR_OF_BLOCK);
-        deletePoint(m_upperRight);
-        deletePoint(m_lowerLeft);
-		if((coordinateBlock_x0 + LENGTH_OF_BLOCK_X + DISTANCE_BETWEEN_BLOCKS) < WIDTH){
-			coordinateBlock_x0 += LENGTH_OF_BLOCK_X + DISTANCE_BETWEEN_BLOCKS;
-			coordinateBlock_x1 += LENGTH_OF_BLOCK_X + DISTANCE_BETWEEN_BLOCKS;
-		}
-		else{
-			coordinateBlock_x0	= initBlock_x0;
-			coordinateBlock_y0	+= (LENGTH_OF_BLOCK_Y + DISTANCE_BETWEEN_BLOCKS);
-			coordinateBlock_x1	= initBlock_x1;
-			coordinateBlock_y1	+= (LENGTH_OF_BLOCK_Y + DISTANCE_BETWEEN_BLOCKS);
-		}
-	}
-}*/
