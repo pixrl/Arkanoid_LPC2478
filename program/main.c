@@ -453,6 +453,7 @@ void drawMenu(Game *game){
 			break;
 		if(26 < x && x < 208 && 256 < y && y < 288){
 			drawSettings(game);
+			mdelay(MENU_DELAY);
 			continue;
 		}
 	}
@@ -466,6 +467,7 @@ void drawSettings(Game *game){
 		if(30<x && x<211 && 67 < y && y < 120){
 			drawSetTime();
 			drawSuccess();
+			mdelay(MENU_DELAY);
 			continue;
 		}
 		if(54 < x && x < 73 && 208 < y && y < 227){
@@ -500,6 +502,7 @@ void drawSuccess(){
 void drawSetTime(){
 	int x,y,z = 0;
 	char rtcString[20];
+	mdelay(MENU_DELAY);
 	while(1){
 		lcd_fillScreen(BLACK);
 		snprintf(rtcString, 20, "%2ld:%2ld:%2ld", RTC_HOUR, RTC_MIN, RTC_SEC);
@@ -515,7 +518,6 @@ void drawSetTime(){
 				break;
 			}
 		}
-		mdelay(MENU_DELAY);
 	}
 }
 /*****************************************************************************
@@ -652,9 +654,9 @@ static tLcdParams ea_QVGA_v2 =
 	touch_init();
 	calibrateStart();
 	srand(RTC_SEC);
+	drawMenu(game);
 	tU16 numOfBlocks = 9 + rand() % 5;
 	Game *game = newGame(240, 320, numOfBlocks);
-	drawMenu(game);
 	playGame(game);
 	deleteGame(game);
 	return 0;
