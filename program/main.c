@@ -97,9 +97,9 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
  *    Images arrays declaration
  *
  ****************************************************************************/
-extern unsigned short arkanoid_menu_mirror[];
+/*extern unsigned short arkanoid_menu_mirror[];
 extern unsigned short arkanoid_settings_mirror[];
-extern unsigned short arkanoid_success_mirror[];
+extern unsigned short arkanoid_success_mirror[];*/
 void lcdShowPicture(unsigned short *image){
 	  unsigned short* buffer = (unsigned short*) LCD_FRAME_BUFFER;
 	  int i, j, k=0;
@@ -163,31 +163,41 @@ tU32 numSamples;
 tU32 sampleRate;
 tU16 usDelay;
 tU16 audioFlag = 1;
+unsigned short val;
 short soundCounter = 0;
 
-void audioPoint(){
+void audio_init(){
+	//Initialize DAC: AOUT = P0.26
+	PINSEL1 &= ~0x00300000;
+	PINSEL1 |=  0x00200000;
+	pData = (unsigned short*)&wavSound[0];
 	DACR = 0x7fc0;
-	numSamples = 1200;
-	cnt++;
-	samples = 0;
-	usDelay = 1000000/ 24000 + 1;
-	samples = 0;
-	cnt = 11 + pData[8]/2;
 
-	while(samples++ < numSamples){
-		tS32 val;
-		val = pData[cnt++];
-		DACR = ((val + 0x7fff) & 0xffc0); // |  //actual value to output
-		
-		udelay(usDelay);
-	}
+	numSamples = 1000;//109408;//58226/2;
 }
+void __attribute__((interrupt("IRQ"))) do_irq(){
+	//irq service code
+	val = wavSound[samples++];
+	DACR = ((val + 0x7fff) & 0xffc0); // |  //actual value to output
 
-void playAudioPoint(Game *inputGame){
-	if(soundCounter==(inputGame->getScore(inputGame))-1){
-		audioPoint();
-		soundCounter++;
-	}
+		// IRQ END
+	T2IR = 0xff;        //reset all IRQ flags
+	VICVectAddr = 0x00;        //dummy write to VIC to signal end of interrupt
+}
+void startTimer1(){
+	//initialize VIC for Timer1 interrupts
+	VICIntSelect &= ~0x4000000;           //Timer2 interrupt is assigned to IRQ (not FIQ)
+	VICVectAddr26  = (tU32)do_irq; 		  //register ISR address
+	VICIntEnable  = 0x4000000;            //enable timer1 interrupt
+
+	//initialize and start Timer #0
+	PCONP |= (1 << 22);						//Turn on Timer2
+	T2TCR = 0x02;                           //disable and reset Timer2
+	T2PR  = 0;           					// prescaler = 0
+	T2MR0 = 1000;//2563; //0.1 s
+	T2IR  = 0xff;                           //reset all flags before enable IRQs
+	T2MCR = 0x03;                           //reset counter and generate IRQ on MR0 match
+	T2TCR = 0x01;                           //start Timer2
 }
 /*****************************************************************************
  *
@@ -338,7 +348,6 @@ void setLedScore(Game *game){
 		setLed(4, 0);
 		break;
 	}
-	playAudioPoint(game);
 	setLed(5, 1);
 	setLed(6, 1);
 	setLed(7, 1);
@@ -496,7 +505,7 @@ void playGame(Game* game){
 	lcd_fillScreen(BLACK);
 	lcd_putString(100, 160, "GAME OVER");
 }
-void drawSetTime(){
+/*void drawSetTime(){
 	int x,y,z = 0;
 	tU16 getOut = 0;
 	char rtcString[20];
@@ -509,12 +518,10 @@ void drawSetTime(){
 			touch_xyz(&x, &y, &z);
 			if(0<x && x<120 && 0<y && y<200){
 				setRtcSec(INCREMENT);
-				mdelay(MENU_DELAY);
 				break;
 			}
 			if(180 < x && x < 240 && 0<y && y<200){
 				setRtcSec(DECREMENT);
-				mdelay(MENU_DELAY);
 				break;
 			}
 			if(0<x && x<240 && 200<y && y<320){
@@ -581,7 +588,7 @@ void drawMenu(tU16 *chosenColor){
 			continue;
 		}
 	}
-}
+}*/
 /*****************************************************************************
  *
  * Description:
@@ -634,11 +641,15 @@ int main(void){
 	lcdTurnOn();
 	touch_init();
 	calibrateStart();
-	srand(RTC_SEC);
-	tU16 numOfBlocks = 9 + rand() % 5;
+	
+	//audio init
+	audio_init();
+	startTimer1();
+	
 	tU16 chosenColor = PURPLE;
-	drawMenu(&chosenColor);
+	//drawMenu(&chosenColor);
 	srand(RTC_SEC + RTC_MIN + RTC_HOUR);
+	tU16 numOfBlocks = 9 + rand() % 5;
 	Game *game = newGame(240, 320, numOfBlocks);
 	game->racketPtr->setColor(game->racketPtr, chosenColor);
 	playGame(game);

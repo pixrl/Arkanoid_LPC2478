@@ -76,7 +76,7 @@
                                          1=partly enabled (enabled for code prefetch, but not for data),
                                          2=fully enabled */
 
-#define IRQ_HANDLER  0                /* 0 = Jump to common IRQ handler
+#define IRQ_HANDLER  1                /* 0 = Jump to common IRQ handler
                                          1 = Load vector directly from VIC, i.e., LDR PC,[PC,#-0xFF0] */
 
 /* initialize the exception vector mapping */
