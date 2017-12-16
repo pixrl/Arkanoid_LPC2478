@@ -566,11 +566,6 @@ int main(void){
 	IOCLR1 |= 0x38000000;
 	PINSEL3 = 0;
 
-	//i2c
-	//IODIR0  |= 0x000F8000; 
-	//IODIR1  |= 0xFFF00000;
-	//FIO2DIR |= 0x0000FFFF;
-
 	eaInit();
 	i2cInit();
 	//initialize PCA9532
