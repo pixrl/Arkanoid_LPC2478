@@ -30,6 +30,7 @@
 #include "game.h"
 #include "i2c.h"
 #include "pca9532.h"
+#include "arkanoidTime.h"
 
 /******************************************************************************
  * Defines and typedefs
@@ -132,7 +133,8 @@ void audio_init(){
 	pData = (unsigned short*)&wavSound[0];
 	DACR = 0x7fc0;
 
-	numSamples = (7312-44)/8;
+	numSamples = 2640/2;
+	//numSamples = 93;
 }
 void __attribute__((interrupt("IRQ"))) do_irq(){
 	//irq service code
@@ -155,7 +157,7 @@ void startTimer1(){
 	PCONP |= (1 << 22);						//Turn on Timer2
 	T2TCR = 0x02;                           //disable and reset Timer2
 	T2PR  = 0;           					// prescaler = 0
-	T2MR0 = 1500;
+	T2MR0 = 1999;
 	T2IR  = 0xff;                           //reset all flags before enable IRQs
 	T2MCR = 0x03;                           //reset counter and generate IRQ on MR0 match
 	T2TCR = 0x01;                           //start Timer2
@@ -325,62 +327,56 @@ void setLedScore(Game *game){
  *    RTC functions
  *
  ****************************************************************************/
-void setRTC(volatile unsigned long *rtcValue, tU16 value){
+/*void setRTC(volatile unsigned long *rtcValue, tU16 value){
 	if(value)
 		(*rtcValue)++;
 	else
 		(*rtcValue)--;
-}
+}*/
 void setRtcHour(tU16 addValue){
 	if(addValue){
-		setRTC(&RTC_HOUR, INCREMENT);
+		setHour(&RTC_HOUR, INCREMENT);
 	}
 	else{
-		setRTC(&RTC_HOUR, DECREMENT);
+		setHour(&RTC_HOUR, DECREMENT);
 	}
 }
 void setRtcMin(tU16 addValue){
 	if(addValue){
 		if(RTC_MIN == 59){
 			setRtcHour(INCREMENT);
-			setRTC(&RTC_MIN, INCREMENT);
+			setMinuteOrSecond(&RTC_MIN, INCREMENT);
 		}
 		else
-			setRTC(&RTC_MIN, INCREMENT);
+			setMinuteOrSecond(&RTC_MIN, INCREMENT);
 	}
 	else{
 		if(RTC_MIN == 0){
 			setRtcHour(DECREMENT);
-			setRTC(&RTC_MIN, DECREMENT);
+			setMinuteOrSecond(&RTC_MIN, DECREMENT);
 		}
 		else
-			setRTC(&RTC_MIN, DECREMENT);
+			setMinuteOrSecond(&RTC_MIN, DECREMENT);
 	}
 }
 void setRtcSec(tU16 addValue){
 	if(addValue){
 		if(RTC_SEC == 59){
 			setRtcMin(INCREMENT);
-			setRTC(&RTC_SEC, INCREMENT);
+			setMinuteOrSecond(&RTC_SEC, INCREMENT);
 		}
 		else
-			setRTC(&RTC_SEC, INCREMENT);
+			setMinuteOrSecond(&RTC_SEC, INCREMENT);
 	}
 	else{
 		if(RTC_SEC == 0){
 			setRtcMin(DECREMENT);
-			setRTC(&RTC_SEC, DECREMENT);
+			setMinuteOrSecond(&RTC_SEC, DECREMENT);
 		}
 		else
-			setRTC(&RTC_SEC, DECREMENT);
+			setMinuteOrSecond(&RTC_SEC, DECREMENT);
 	}
 }
-
-
-/*void showRTC(){
-	lcd_putString(100, 160, "GAME OVER");
-	RTC_HOUR RTC_MIN RTC_SEC
-}*/
 /*****************************************************************************
  *
  * Description:
@@ -474,7 +470,7 @@ void playGame(Game* game){
 	mdelay(MENU_DELAY);
 	while(1){
 		lcd_fillScreen(BLACK);
-		snprintf(rtcString, 20, "%2ld:%2ld:%2ld", RTC_HOUR, RTC_MIN, RTC_SEC);
+		snprintf(rtcString, 20, "%2lu:%2lu:%2lu", RTC_HOUR, RTC_MIN, RTC_SEC);
 		lcd_putString(100, 160, rtcString);
 		while(1){
 			touch_xyz(&x, &y, &z);
@@ -591,13 +587,12 @@ int main(void){
 	touch_init();
 	calibrateStart();
 	
+	tU16 chosenColor = RED;
+	//drawMenu(&chosenColor);
 	//audio init
 	audio_init();
 	startTimer1();
-	
-	tU16 chosenColor = RED;
-	//drawMenu(&chosenColor);
-	srand(RTC_SEC + RTC_MIN + RTC_HOUR);
+	srand(RTC_CTIME0);
 	tU16 numOfBlocks = 9 + rand() % 5;
 	Game *game = newGame(240, 320, numOfBlocks);
 	game->racketPtr->setColor(game->racketPtr, chosenColor);

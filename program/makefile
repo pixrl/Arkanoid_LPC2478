@@ -50,7 +50,7 @@ EFLAGS  = -mthumb-interwork
 CODE    = ARM
 
 # List C source files here.
-CSRCS   = main.c delay.c sdram.c i2c.c pca9532.c sndBallHit.c calibrate.c calibapp.c touch.c src/ball.c src/block.c src/direction.c src/game.c src/point.c src/racket.c 
+CSRCS   = main.c delay.c sdram.c i2c.c pca9532.c sndBallHit.c calibrate.c calibapp.c touch.c arkanoidTime.c src/ball.c src/block.c src/direction.c src/game.c src/point.c src/racket.c 
 #img/menu.c img/settings.c img/success.c
 
 # List assembler source files here

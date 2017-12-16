@@ -157,9 +157,7 @@ lcd_point(tU16 x,
   {
     return;
   }
-
   *((tU16 *)(LCD_FRAME_BUFFER + x*2 + 240*2*y)) = color;
-
 
   return;
 }
