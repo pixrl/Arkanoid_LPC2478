@@ -118,53 +118,12 @@ void lcdShowPicture(unsigned short *image){
  *    Sound arrays declaration
  *
  ****************************************************************************/
-
-extern char wavSound[];
-
+extern unsigned short wavSound[];
 tU32 wavSoundSize();
-                                         /* TIMERS */
-static void delayMs(tU16 delayInMs)
-{
-	/*
-	 * setup timer #1 for delay
-	 */
-	T1TCR = 0x02;          //stop and reset timer
-	T1PR  = 0x00;          //set prescaler to zero
-	T1MR0 = delayInMs * (Fpclk / 1000);
-	T1IR  = 0xff;          //reset all interrrupt flags
-	T1MCR = 0x04;          //stop timer on match
-	T1TCR = 0x01;          //start timer
-
-	//wait until delay time has elapsed
-	while (T1TCR & 0x01)
-		;
-}
-static void udelay( unsigned int delayInUs )
-{
-	/*
-	 * setup timer #1 for delay
-	 */
-	T1TCR = 0x02;          //stop and reset timer
-	T1PR  = 0x00;          //set prescaler to zero
-	T1MR0 = (((long)delayInUs-1) * (long)Fpclk/1000) / 1000;
-	T1IR  = 0xff;          //reset all interrrupt flags
-	T1MCR = 0x04;          //stop timer on match
-	T1TCR = 0x01;          //start timer
-
-	//wait until delay time has elapsed
-	while (T1TCR & 0x01)
-		;
-}
-short* pData = NULL;
-tU32 size = 0;
-tU32 cnt = 0;
+unsigned short* pData = NULL;
 tU32 samples = 0;
 tU32 numSamples;
-tU32 sampleRate;
-tU16 usDelay;
-tU16 audioFlag = 1;
 unsigned short val;
-short soundCounter = 0;
 
 void audio_init(){
 	//Initialize DAC: AOUT = P0.26
@@ -173,14 +132,16 @@ void audio_init(){
 	pData = (unsigned short*)&wavSound[0];
 	DACR = 0x7fc0;
 
-	numSamples = 1000;//109408;//58226/2;
+	numSamples = (7312-44)/8;
 }
 void __attribute__((interrupt("IRQ"))) do_irq(){
 	//irq service code
-	val = wavSound[samples++];
-	DACR = ((val + 0x7fff) & 0xffc0); // |  //actual value to output
-
-		// IRQ END
+	if (samples <= numSamples)
+	{
+		val = wavSound[samples++];
+		DACR = ((val + 0x7fff) & 0xffc0); // |  //actual value to output
+	}
+	// IRQ END
 	T2IR = 0xff;        //reset all IRQ flags
 	VICVectAddr = 0x00;        //dummy write to VIC to signal end of interrupt
 }
@@ -194,7 +155,7 @@ void startTimer1(){
 	PCONP |= (1 << 22);						//Turn on Timer2
 	T2TCR = 0x02;                           //disable and reset Timer2
 	T2PR  = 0;           					// prescaler = 0
-	T2MR0 = 1000;//2563; //0.1 s
+	T2MR0 = 1500;
 	T2IR  = 0xff;                           //reset all flags before enable IRQs
 	T2MCR = 0x03;                           //reset counter and generate IRQ on MR0 match
 	T2TCR = 0x01;                           //start Timer2
@@ -348,6 +309,7 @@ void setLedScore(Game *game){
 		setLed(4, 0);
 		break;
 	}
+	samples = 0;
 	setLed(5, 1);
 	setLed(6, 1);
 	setLed(7, 1);
@@ -609,14 +571,6 @@ int main(void){
 	//IODIR1  |= 0xFFF00000;
 	//FIO2DIR |= 0x0000FFFF;
 
-	//Sound
-
-	PINSEL1 &= ~0x00300000;
-	PINSEL1 |=  0x00200000;
-
-	pData = (short*)&wavSound[0];
-	size = wavSoundSize();
-
 	eaInit();
 	i2cInit();
 	//initialize PCA9532
@@ -646,7 +600,7 @@ int main(void){
 	audio_init();
 	startTimer1();
 	
-	tU16 chosenColor = PURPLE;
+	tU16 chosenColor = RED;
 	//drawMenu(&chosenColor);
 	srand(RTC_SEC + RTC_MIN + RTC_HOUR);
 	tU16 numOfBlocks = 9 + rand() % 5;

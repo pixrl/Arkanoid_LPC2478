@@ -114,25 +114,13 @@ tU16 isIntersectingBlockBall(Block* block, Ball* ball){
         && (block->getLowerLeft(block).y    <= (ball->getCenter(ball).y + ball->getRadius(ball)))
         && (block->getUpperRight(block).y   >= (ball->getCenter(ball).y - ball->getRadius(ball))));
 }
-/*         ballCenter.x + ballRadius >= inputGame->blocks[blockIndex].points[LOWERLEFT].x 
-		&& ballCenter.x + ballRadius <= inputGame->blocks[blockIndex].points[UPPERRIGHT].x
-		&& ballCenter.y + ballRadius <= inputGame->blocks[blockIndex].points[LOWERLEFT].y
-		&& ballCenter.y + ballRadius >= inputGame->blocks[blockIndex].points[UPPERRIGHT].y)*/
 tU16 isIntersectingRacketBall(Racket* racket, Ball* ball){
     return ((racket->getUpperRight(racket).x >= (ball->getCenter(ball).x - ball->getRadius(ball)))
         && (racket->getLowerLeft(racket).x   <= (ball->getCenter(ball).x + ball->getRadius(ball)))
         && (racket->getLowerLeft(racket).y   <= (ball->getCenter(ball).y + ball->getRadius(ball)))
         && (racket->getUpperRight(racket).y  >= (ball->getCenter(ball).y - ball->getRadius(ball))));
 }
-/*tU16 isIntersectingEdgeBall(Game* game, Ball* ball){
-    return ((game->getEdge(game, right)  >= (ball->getCenter(ball).x - ball->getRadius(ball)))
-        || (game->getEdge(game, left)    <= (ball->getCenter(ball).x + ball->getRadius(ball)))
-        || (game->getEdge(game, bottom)  >= (ball->getCenter(ball).y + ball->getRadius(ball)))
-        || (game->getEdge(game, top)     <= (ball->getCenter(ball).y - ball->getRadius(ball))));
-}*/
 void testCollisionEdgeBall(Game* game){
-    /*if(!isIntersectingEdgeBall(game, game->ballPtr))
-        return;*/
     if((game->ballPtr->center.x - game->ballPtr->radius) >= game->getEdge(game, left))
         game->ballPtr->direction.x *= -1;
     if((game->ballPtr->center.x + game->ballPtr->radius) <= game->getEdge(game, right))
@@ -148,30 +136,30 @@ void testCollisionEdgeBall(Game* game){
 tU16 testCollisionBlockBall(Ball* ball, Block* block){
     if(!isIntersectingBlockBall(block, ball))
         return 0;
-    if((ball->center.x + ball->radius) >= block->getLowerLeft(block).x){
+    if((ball->getCenter(ball).x + ball->radius) >= block->getLowerLeft(block).x){
         ball->direction.x *= -1;
     }
-    if((ball->center.x - ball->radius) <= block->getUpperRight(block).x){
-        ball->direction.x *= -1;
-    }
-    if((ball->center.y - ball->radius) >= block->getUpperRight(block).y){
+	if((ball->getCenter(ball).x - ball->radius) <= block->getUpperRight(block).x){
+		ball->direction.x *= -1;
+	}
+    if((ball->getCenter(ball).y - ball->radius) >= block->getUpperRight(block).y){
         ball->direction.y *= -1;
     }
-    if((ball->center.y + ball->radius) <= block->getLowerLeft(block).y){
+    if((ball->getCenter(ball).y + ball->radius) <= block->getLowerLeft(block).y){
         ball->direction.y *= -1;
     }
     return 1;
 }
 void testCollisionRacketBall(Ball* ball, Racket* racket){
     if(!isIntersectingRacketBall(racket, ball))
-        return;
-    if((ball->center.x - ball->radius) <= racket->getLowerLeft(racket).x)
+        return;	
+    if((ball->getCenter(ball).x - ball->radius) <= racket->getLowerLeft(racket).x)
         ball->direction.x *= -1;
-    if((ball->center.x + ball->radius) >= racket->getUpperRight(racket).x)
+    if((ball->getCenter(ball).x + ball->radius) >= racket->getUpperRight(racket).x)
         ball->direction.x *= -1;
-    if((ball->center.y - ball->radius) >= racket->getUpperRight(racket).y)
+    if((ball->getCenter(ball).y - ball->radius) >= racket->getUpperRight(racket).y)
         ball->direction.y *= -1;
-    if((ball->center.y + ball->radius) <= racket->getLowerLeft(racket).y)
+    if((ball->getCenter(ball).y + ball->radius) <= racket->getLowerLeft(racket).y)
         ball->direction.y *= -1;
     return;
 }
