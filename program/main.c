@@ -98,9 +98,9 @@ lcd_color_t const COLORS_TAB[16] = {BLACK,
  *    Images arrays declaration
  *
  ****************************************************************************/
-/*extern unsigned short arkanoid_menu_mirror[];
+extern unsigned short arkanoid_menu_mirror[];
 extern unsigned short arkanoid_settings_mirror[];
-extern unsigned short arkanoid_success_mirror[];*/
+extern unsigned short arkanoid_success_mirror[];
 void lcdShowPicture(unsigned short *image){
 	  unsigned short* buffer = (unsigned short*) LCD_FRAME_BUFFER;
 	  int i, j, k=0;
@@ -134,7 +134,6 @@ void audio_init(){
 	DACR = 0x7fc0;
 
 	numSamples = 2640/2;
-	//numSamples = 93;
 }
 void __attribute__((interrupt("IRQ"))) do_irq(){
 	//irq service code
@@ -157,7 +156,7 @@ void startTimer1(){
 	PCONP |= (1 << 22);						//Turn on Timer2
 	T2TCR = 0x02;                           //disable and reset Timer2
 	T2PR  = 0;           					// prescaler = 0
-	T2MR0 = 1999;
+	T2MR0 = Fpclk/8000;
 	T2IR  = 0xff;                           //reset all flags before enable IRQs
 	T2MCR = 0x03;                           //reset counter and generate IRQ on MR0 match
 	T2TCR = 0x01;                           //start Timer2
@@ -327,12 +326,6 @@ void setLedScore(Game *game){
  *    RTC functions
  *
  ****************************************************************************/
-/*void setRTC(volatile unsigned long *rtcValue, tU16 value){
-	if(value)
-		(*rtcValue)++;
-	else
-		(*rtcValue)--;
-}*/
 void setRtcHour(tU16 addValue){
 	if(addValue){
 		setHour(&RTC_HOUR, INCREMENT);
@@ -463,7 +456,7 @@ void playGame(Game* game){
 	lcd_fillScreen(BLACK);
 	lcd_putString(100, 160, "GAME OVER");
 }
-/*void drawSetTime(){
+void drawSetTime(){
 	int x,y,z = 0;
 	tU16 getOut = 0;
 	char rtcString[20];
@@ -546,7 +539,7 @@ void drawMenu(tU16 *chosenColor){
 			continue;
 		}
 	}
-}*/
+}
 /*****************************************************************************
  *
  * Description:
@@ -588,7 +581,7 @@ int main(void){
 	calibrateStart();
 	
 	tU16 chosenColor = RED;
-	//drawMenu(&chosenColor);
+	drawMenu(&chosenColor);
 	//audio init
 	audio_init();
 	startTimer1();
