@@ -7,13 +7,6 @@
 #include "point.h"
 #include "direction.h"
 
-typedef enum{
-    upRight,                       /* 0 */
-    upLeft,                        /* 1 */
-    downLeft,                      /* 2 */
-    downRight                      /* 3 */
-} typeBallDirection;
-
 struct m_game;
 
 typedef struct m_game Game;

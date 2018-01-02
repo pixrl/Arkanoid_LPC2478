@@ -126,7 +126,7 @@ tU32 samples = 0;
 tU32 numSamples;
 unsigned short val;
 
-void audio_init(){
+static void audio_init(){
 	//Initialize DAC: AOUT = P0.26
 	PINSEL1 &= ~0x00300000;
 	PINSEL1 |=  0x00200000;
@@ -135,7 +135,7 @@ void audio_init(){
 
 	numSamples = 2640/2;
 }
-void __attribute__((interrupt("IRQ"))) do_irq(){
+static void __attribute__((interrupt("IRQ"))) do_irq(){
 	//irq service code
 	if (samples <= numSamples)
 	{
@@ -146,7 +146,7 @@ void __attribute__((interrupt("IRQ"))) do_irq(){
 	T2IR = 0xff;        //reset all IRQ flags
 	VICVectAddr = 0x00;        //dummy write to VIC to signal end of interrupt
 }
-void startTimer1(){
+static void startTimer1(){
 	//initialize VIC for Timer1 interrupts
 	VICIntSelect &= ~0x4000000;           //Timer2 interrupt is assigned to IRQ (not FIQ)
 	VICVectAddr26  = (tU32)do_irq; 		  //register ISR address
@@ -167,7 +167,7 @@ void startTimer1(){
  *    LED functions
  *
  ****************************************************************************/
-void setLed(int led, int on)
+static void setLed(int led, int on)
 {
 	tU8 commandString[] = {0x08, 0x00};
 	tU8 reg;
@@ -210,7 +210,7 @@ void setLed(int led, int on)
 	commandString[1] = reg;
 	pca9532(commandString, sizeof(commandString), NULL, 0);
 }
-void setLedScore(Game *game){
+static void setLedScore(Game *game){
 	switch(game->getScore(game))
 	{
 	case 1:
@@ -326,7 +326,7 @@ void setLedScore(Game *game){
  *    RTC functions
  *
  ****************************************************************************/
-void setRtcHour(tU16 addValue){
+static void setRtcHour(tU16 addValue){
 	if(addValue){
 		setHour(&RTC_HOUR, INCREMENT);
 	}
@@ -334,7 +334,7 @@ void setRtcHour(tU16 addValue){
 		setHour(&RTC_HOUR, DECREMENT);
 	}
 }
-void setRtcMin(tU16 addValue){
+static void setRtcMin(tU16 addValue){
 	if(addValue){
 		if(RTC_MIN == 59){
 			setRtcHour(INCREMENT);
@@ -352,7 +352,7 @@ void setRtcMin(tU16 addValue){
 			setMinuteOrSecond(&RTC_MIN, DECREMENT);
 	}
 }
-void setRtcSec(tU16 addValue){
+static void setRtcSec(tU16 addValue){
 	if(addValue){
 		if(RTC_SEC == 59){
 			setRtcMin(INCREMENT);
@@ -376,7 +376,7 @@ void setRtcSec(tU16 addValue){
  *    Functions drawing the program on the screen
  *
  ****************************************************************************/
-void refreshScreen(Game* game){
+static void refreshScreen(Game* game){
 	int i = 0;
 	lcd_fillRect(game->racketPtr->getUpperRight(game->racketPtr).x, 
 				 game->racketPtr->getUpperRight(game->racketPtr).y,
@@ -407,14 +407,14 @@ void refreshScreen(Game* game){
     	}
     }
 }
-tU16 ifScored(Game *game){
+static tU16 ifScored(Game *game){
 	if(game->getScore(game) != previousScore){
 		previousScore = game->getScore(game);
 		return 1;
 	}
 	return 0;
 }
-void playGame(Game* game){
+static void playGame(Game* game){
 	lcd_fillScreen(BLACK);
 	refreshScreen(game);
     while(!game->isLost(game))
@@ -456,7 +456,7 @@ void playGame(Game* game){
 	lcd_fillScreen(BLACK);
 	lcd_putString(100, 160, "GAME OVER");
 }
-void drawSetTime(){
+static void drawSetTime(){
 	int x,y,z = 0;
 	tU16 getOut = 0;
 	char rtcString[20];
@@ -484,7 +484,7 @@ void drawSetTime(){
 			break;
 	}
 }
-void drawSuccess(){
+static void drawSuccess(){
 	lcdShowPicture(arkanoid_success_mirror);
 	int x,y,z = 0;
 	mdelay(MENU_DELAY);
@@ -495,7 +495,7 @@ void drawSuccess(){
 	}
 	lcdShowPicture(arkanoid_settings_mirror);
 }
-void drawSettings(tU16 *chosenColor){
+static void drawSettings(tU16 *chosenColor){
 	lcdShowPicture(arkanoid_settings_mirror);
 	int x,y,z = 0;
 	mdelay(MENU_DELAY);
@@ -525,7 +525,7 @@ void drawSettings(tU16 *chosenColor){
 	}
 	lcdShowPicture(arkanoid_menu_mirror);
 }
-void drawMenu(tU16 *chosenColor){
+static void drawMenu(tU16 *chosenColor){
 	lcdShowPicture(arkanoid_menu_mirror);
 	int x,y,z = 0;
 	mdelay(MENU_DELAY);
