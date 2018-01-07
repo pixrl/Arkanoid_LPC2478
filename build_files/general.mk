@@ -100,7 +100,7 @@ endif
 #----------------------------------------------------------------------
 W_OPTS    = -Wall -Wcast-align -Wcast-qual -Wimplicit \
             -Wnested-externs -Wpointer-arith -Wswitch \
-            -Wdiscarded-qualifiers
+#           -Wdiscarded-qualifiers
 #           -Wreturn-type -Wshadow -Wunused 
 #           -Wmissing-declarations -Wmissing-prototypes -Wredundant-decls -Wstrict-prototypes
 LINKER_FLAGS = -specs=nano.specs -specs=nosys.specs
